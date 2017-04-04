@@ -17,6 +17,8 @@ namespace GraphProject
 
             public Meta()
             {
+                g = 0;
+                depth = 0;
                 state = VisitState.undiscovered;
             }
 		};
@@ -24,7 +26,7 @@ namespace GraphProject
         public Graph<T> graph;
 
         private Meta[] metadata;
-        private Queue<Graph<T>.Node> frontier;
+        private List<Graph<T>.Node> frontier;
 
         private T start, goal;
         private float threshold;
@@ -59,19 +61,31 @@ namespace GraphProject
 			goalNode = graph.FindNode(goal, searcher, threshold);
 
             metadata = new Meta[graph.nodes.Count];
-            frontier = new Queue<Graph<T>.Node>();
+            frontier = new List<Graph<T>.Node>();
 
             var snode = graph.FindNode(start, searcher, threshold);
             for(int i = 0; i < metadata.Length; ++i)
                 metadata[i] = new Meta();
 
             metadata[snode.uid].state = Meta.VisitState.frontier;
-            frontier.Enqueue(snode);
+            frontier.Add(snode);
+        }
+        // 1, 0, -1
+        private int dijkstra(Graph<T>.Node a, Graph<T>.Node b)
+        {
+            int res = 0;
+            if (metadata[a.uid].g < metadata[b.uid].g)
+                res = -1;
+            if (metadata[a.uid].g > metadata[b.uid].g)
+                res = 1;
+            return res;
         }
 
 		public bool step()
         {
-            var current = frontier.Dequeue();
+            frontier.Sort(dijkstra);
+            var current = frontier[0];
+            frontier.RemoveAt(0);
 
             metadata[current.uid].state = Meta.VisitState.explored;
 
@@ -88,15 +102,16 @@ namespace GraphProject
 
                 if (metadata[e.end.uid].state == Meta.VisitState.undiscovered)
 				{
-		            frontier.Enqueue(e.end);
+		            frontier.Add(e.end);
 	                metadata[e.end.uid].state = Meta.VisitState.frontier;
                 }
+
                 if (metadata[e.end.uid].state == Meta.VisitState.frontier)
                 {
                     if(g < metadata[e.end.uid].g || metadata[e.end.uid].prev == null)
                     {
-                        metadata[e.end.uid].prev = current;
-                        metadata[e.end.uid].g = g;
+                        metadata[e.end.uid].prev  = current;
+                        metadata[e.end.uid].g     = g;
                         metadata[e.end.uid].depth = d;
                     }
                 }
