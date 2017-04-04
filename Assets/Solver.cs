@@ -10,11 +10,15 @@ namespace GraphProject
 		{
             public enum VisitState {undiscovered, frontier, explored};
             public VisitState state;
-
-			// When we add a node to the frontier
-				// We will set it's previous to whatever the current node is.
             public Graph<T>.Node prev;
-            public Meta() { state = VisitState.undiscovered; }
+
+            public uint depth;
+            public float g;
+
+            public Meta()
+            {
+                state = VisitState.undiscovered;
+            }
 		};
 
         public Graph<T> graph;
@@ -78,13 +82,25 @@ namespace GraphProject
             }
             
 			foreach(var e in current.edges)
-				if(metadata[e.end.uid].state == Meta.VisitState.undiscovered)
+            {
+                float g = e.weight + metadata[current.uid].g;
+                uint  d = 1 + metadata[current.uid].depth;
+
+                if (metadata[e.end.uid].state == Meta.VisitState.undiscovered)
 				{
-					// update the previous
 		            frontier.Enqueue(e.end);
 	                metadata[e.end.uid].state = Meta.VisitState.frontier;
-                    metadata[e.end.uid].prev = current;
                 }
+                if (metadata[e.end.uid].state == Meta.VisitState.frontier)
+                {
+                    if(g < metadata[e.end.uid].g || metadata[e.end.uid].prev == null)
+                    {
+                        metadata[e.end.uid].prev = current;
+                        metadata[e.end.uid].g = g;
+                        metadata[e.end.uid].depth = d;
+                    }
+                }
+            }
             return frontier.Count != 0;
         }
 	}

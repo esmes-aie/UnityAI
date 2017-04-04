@@ -10,12 +10,14 @@ public class GraphManager : MonoBehaviour {
     public List<Transform> start, end;
 
     public Transform pathStart, pathEnd;
-    private List<Transform> path;
+
+    public List<Transform> path;
+
     public int gridSize = 4;
     public float gridSpace = 1;
     public bool genGridKeep = false;
     public bool generateGrid = true;
-    
+
 
 
     private static float diff(Transform a, Transform b)
@@ -39,7 +41,7 @@ public class GraphManager : MonoBehaviour {
 
         for (int i = 0; i < start.Count; ++i)
             if (start[i] != null && end[i] != null)
-                graph.AddEdge(start[i], end[i], diff);
+                graph.AddEdge(start[i], end[i], diff,0.0001f, diff(start[i], end[i]));
     }
 
     // Use this for initialization
