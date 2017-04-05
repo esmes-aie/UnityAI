@@ -97,14 +97,29 @@ public class GraphManager : MonoBehaviour {
                 Gizmos.DrawLine(start[i].position,
                                   end[i].position);
             }
-
-        foreach(var t in path)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(t.position, .2f);
-        }
     }
 
+
+    public List<Vector3> FindPathBetween(Transform start, Transform end)
+    {
+        solver.init(start, end, diff, 100.0f);
+        while (solver.step());
+        path = solver.solution;
+
+        List<Vector3> retval = new List<Vector3>();
+        Transform source = path[0];
+        retval.Add(source.position);
+
+        for(int i = 1; i < path.Count; ++i)
+            if(!ValidateEdge(source, path[i]) && path[i] != end)
+            {
+                source = path[i - 1];
+                retval.Add(source.position);
+            }
+        retval.Add(path[path.Count-1].position);
+
+        return retval;
+    }
 
 
     // Called by the editor when a serialized field is modified
@@ -152,7 +167,7 @@ public class GraphManager : MonoBehaviour {
                 {
                     start.Add(t_array[n]);
                     end.Add(t_array[n + gridSize]);
-                }
+                } 
                 if (((n + 1) % gridSize) != 0 &&
                     n + gridSize < gridSize * gridSize)
                 {
@@ -168,13 +183,13 @@ public class GraphManager : MonoBehaviour {
             } 
         }
         genGridKeep = true;
-
-        if(pathStart != null && pathEnd != null)
-        {
-            InitializeGraph();
-            solver.init(pathStart, pathEnd, diff, 100.0f);
-            while (solver.step());
-            path = solver.solution;
-        }
+        InitializeGraph();
+        //if (pathStart != null && pathEnd != null)
+        //{
+        //    InitializeGraph();
+        //    solver.init(pathStart, pathEnd, diff, 100.0f);
+        //    while (solver.step());
+        //    path = solver.solution;
+        //}
     }
 }
