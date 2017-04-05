@@ -25,6 +25,22 @@ public class GraphManager : MonoBehaviour {
         return Vector3.Distance(a.position, b.position);
     }
 
+    bool IsObstructed(Transform t)
+    {
+        return Physics.CheckSphere(t.position  , 0.1f);
+    }
+
+    // returns true if the edge is valid.
+    bool ValidateEdge(Transform start, Transform end)
+    {
+        var diff = end.position - start.position;
+        RaycastHit info;
+        bool result = Physics.SphereCast(start.position, 0.1f,
+                           diff.normalized, out info, Vector3.Magnitude(diff));
+
+        return !(result || IsObstructed(start) || IsObstructed(end));
+    }
+
     void InitializeGraph()
     {
         graph = new GraphProject.Graph<Transform>();
@@ -32,6 +48,14 @@ public class GraphManager : MonoBehaviour {
         solver.graph = graph;
 
         HashSet<Transform> set = new HashSet<Transform>();
+        //
+        for(int i = 0; i < start.Count; ++i)
+            if(start[i] != null && end[i] != null && !ValidateEdge(start[i],end[i]))
+            {
+                start[i] = null;
+                end[i] = null;
+            }
+
         set.UnionWith(start);
         set.UnionWith(end);
 
@@ -43,6 +67,7 @@ public class GraphManager : MonoBehaviour {
             if (start[i] != null && end[i] != null)
                 graph.AddEdge(start[i], end[i], diff,0.0001f, diff(start[i], end[i]));
     }
+
 
     // Use this for initialization
     void Start ()
@@ -116,22 +141,32 @@ public class GraphManager : MonoBehaviour {
                 }
             }
 
-            // generate connections
             for(int n = 0; n < gridSize*gridSize; ++n)
-            {
-                // form an edge with the node above me
+            {                
                 if(((n+1)%gridSize) !=  0)
                 {
                     start.Add(t_array[n]);
                     end.Add(t_array[n+1]);
                 }
-                // form an edge with the node to the right of me
+                
                 if(n+gridSize < gridSize * gridSize)
                 {
                     start.Add(t_array[n]);
                     end.Add(t_array[n + gridSize]);
                 }
-            }
+                if(((n + 1) % gridSize) != 0 &&
+                    n + gridSize < gridSize * gridSize)
+                {
+                    start.Add(t_array[n]);
+                    end.Add(t_array[n + 1 + gridSize]);
+                }
+                if ( false && // up-left condition
+                     n + gridSize < gridSize * gridSize)
+                {
+                    start.Add(t_array[n]);
+                    end.Add(t_array[n + -1 + gridSize]);
+                }
+            } 
         }
         genGridKeep = true;
 

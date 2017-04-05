@@ -14,10 +14,13 @@ namespace GraphProject
 
             public uint depth;
             public float g;
+            public float h;
+            public float f { get { return g + h; } }
 
             public Meta()
             {
                 g = 0;
+                h = 0;
                 depth = 0;
                 state = VisitState.undiscovered;
             }
@@ -81,9 +84,20 @@ namespace GraphProject
             return res;
         }
 
-		public bool step()
+        private int astar(Graph<T>.Node a, Graph<T>.Node b)
         {
-            frontier.Sort(dijkstra);
+            int res = 0;
+            if (metadata[a.uid].f < metadata[b.uid].f)
+                res = -1;
+            if (metadata[a.uid].f > metadata[b.uid].f)
+                res = 1;
+            return res;
+        }
+
+
+        public bool step()
+        {
+            frontier.Sort(astar);
             var current = frontier[0];
             frontier.RemoveAt(0);
 
@@ -104,6 +118,8 @@ namespace GraphProject
 				{
 		            frontier.Add(e.end);
 	                metadata[e.end.uid].state = Meta.VisitState.frontier;
+                    // Determine the h score!
+                    metadata[e.end.uid].h = searcher(e.end.data, goalNode.data);
                 }
 
                 if (metadata[e.end.uid].state == Meta.VisitState.frontier)
