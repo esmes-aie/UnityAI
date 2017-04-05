@@ -142,25 +142,24 @@ public class GraphManager : MonoBehaviour {
             }
 
             for(int n = 0; n < gridSize*gridSize; ++n)
-            {                
-                if(((n+1)%gridSize) !=  0)
+            {
+                if (((n + 1) % gridSize) != 0)
                 {
                     start.Add(t_array[n]);
-                    end.Add(t_array[n+1]);
+                    end.Add(t_array[n + 1]);
                 }
-                
-                if(n+gridSize < gridSize * gridSize)
+                if (n + gridSize < gridSize * gridSize)
                 {
                     start.Add(t_array[n]);
                     end.Add(t_array[n + gridSize]);
                 }
-                if(((n + 1) % gridSize) != 0 &&
+                if (((n + 1) % gridSize) != 0 &&
                     n + gridSize < gridSize * gridSize)
                 {
                     start.Add(t_array[n]);
                     end.Add(t_array[n + 1 + gridSize]);
                 }
-                if ( false && // up-left condition
+                if (n % gridSize != 0 && // up-left condition
                      n + gridSize < gridSize * gridSize)
                 {
                     start.Add(t_array[n]);
