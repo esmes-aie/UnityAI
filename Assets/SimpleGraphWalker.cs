@@ -12,7 +12,8 @@ public class SimpleGraphWalker : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        pathToWalk = gm.FindPathBetween(transform, target);
+        if(target != null)
+            pathToWalk = gm.FindPathBetween(transform, target);
 	}
 
     // Update is called once per frame
@@ -22,26 +23,28 @@ public class SimpleGraphWalker : MonoBehaviour {
         // What direction do we want to walk in?
         Vector3 dir = (pathToWalk[0] - transform.position).normalized;
 
-
         transform.position += dir * Time.deltaTime;
 
         if (Vector3.Distance(pathToWalk[0], transform.position) < .1f)
             pathToWalk.RemoveAt(0);
-
     }
 
     private void OnValidate()
     {
-        if(target != null)
+        if (target != null && gm != null)
+        { 
             pathToWalk = gm.FindPathBetween(transform, target);
+        }
+        else pathToWalk = null;
     }
 
     private void OnDrawGizmos()
     {
-        foreach (var t in pathToWalk)
-        {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(t, .3f);
-        }
+        if(pathToWalk != null)
+            foreach (var t in pathToWalk)
+            {
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireSphere(t, .3f);
+            }
     }
 }

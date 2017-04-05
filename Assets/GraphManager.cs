@@ -9,10 +9,6 @@ public class GraphManager : MonoBehaviour {
 
     public List<Transform> start, end;
 
-    public Transform pathStart, pathEnd;
-
-    public List<Transform> path;
-
     public int gridSize = 4;
     public float gridSpace = 1;
     public bool genGridKeep = false;
@@ -31,14 +27,15 @@ public class GraphManager : MonoBehaviour {
     }
 
     // returns true if the edge is valid.
-    bool ValidateEdge(Transform start, Transform end)
+    bool ValidateEdge(Transform start, Transform end, bool useObstruction = true)
     {
         var diff = end.position - start.position;
         RaycastHit info;
         bool result = Physics.SphereCast(start.position, 0.1f,
                            diff.normalized, out info, Vector3.Magnitude(diff));
 
-        return !(result || IsObstructed(start) || IsObstructed(end));
+        return !(result || useObstruction && IsObstructed(start)
+                        || useObstruction && IsObstructed(end));
     }
 
     void InitializeGraph()
@@ -70,7 +67,7 @@ public class GraphManager : MonoBehaviour {
 
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         InitializeGraph();
     }
@@ -89,7 +86,6 @@ public class GraphManager : MonoBehaviour {
                 Gizmos.DrawWireSphere(t.position, .1f);
             }
 
-
         for (int i = 0; i < start.Count; ++i)
             if(start[i] != null && end[i] != null)
             {
@@ -102,16 +98,19 @@ public class GraphManager : MonoBehaviour {
 
     public List<Vector3> FindPathBetween(Transform start, Transform end)
     {
+        if (graph == null || solver == null)
+            InitializeGraph();
+
         solver.init(start, end, diff, 100.0f);
         while (solver.step());
-        path = solver.solution;
+        var path = solver.solution;
 
         List<Vector3> retval = new List<Vector3>();
         Transform source = path[0];
         retval.Add(source.position);
 
         for(int i = 1; i < path.Count; ++i)
-            if(!ValidateEdge(source, path[i]) && path[i] != end)
+            if(!ValidateEdge(source, path[i], source != path[0]) && path[i] != end)
             {
                 source = path[i - 1];
                 retval.Add(source.position);
@@ -184,12 +183,5 @@ public class GraphManager : MonoBehaviour {
         }
         genGridKeep = true;
         InitializeGraph();
-        //if (pathStart != null && pathEnd != null)
-        //{
-        //    InitializeGraph();
-        //    solver.init(pathStart, pathEnd, diff, 100.0f);
-        //    while (solver.step());
-        //    path = solver.solution;
-        //}
     }
 }
