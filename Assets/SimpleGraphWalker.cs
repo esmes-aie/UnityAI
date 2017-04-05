@@ -41,10 +41,13 @@ public class SimpleGraphWalker : MonoBehaviour {
     private void OnDrawGizmos()
     {
         if(pathToWalk != null)
-            foreach (var t in pathToWalk)
+            for(int i = 0; i < pathToWalk.Count; ++i)
             {
                 Gizmos.color = Color.magenta;
-                Gizmos.DrawWireSphere(t, .3f);
+                Gizmos.DrawWireSphere(pathToWalk[i], .3f);
+
+                if(i < pathToWalk.Count-1)
+                    Gizmos.DrawLine(pathToWalk[i], pathToWalk[i + 1]);
             }
     }
 }
