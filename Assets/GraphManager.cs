@@ -13,6 +13,7 @@ public class GraphManager : MonoBehaviour {
     public float gridSpace = 1;
     public bool genGridKeep = false;
     public bool generateGrid = true;
+    public float radius = 0.1f;
 
 
 
@@ -23,7 +24,7 @@ public class GraphManager : MonoBehaviour {
 
     bool IsObstructed(Transform t)
     {
-        return Physics.CheckSphere(t.position  , 0.1f);
+        return Physics.CheckSphere(t.position, radius);
     }
 
     // returns true if the edge is valid.
@@ -31,9 +32,9 @@ public class GraphManager : MonoBehaviour {
     {
         var diff = end.position - start.position;
         RaycastHit info;
-        bool result = Physics.SphereCast(start.position, 0.1f,
+        bool result = Physics.SphereCast(start.position, radius,
                            diff.normalized, out info, Vector3.Magnitude(diff));
-
+        
         return !(result || useObstruction && IsObstructed(start)
                         || useObstruction && IsObstructed(end));
     }
@@ -83,7 +84,7 @@ public class GraphManager : MonoBehaviour {
             if(t != null)
             {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(t.position, .1f);
+                Gizmos.DrawWireSphere(t.position, radius);
             }
 
         for (int i = 0; i < start.Count; ++i)
@@ -104,6 +105,9 @@ public class GraphManager : MonoBehaviour {
         solver.init(start, end, diff, 100.0f);
         while (solver.step());
         var path = solver.solution;
+
+        if (path == null)
+            return null;
 
         List<Vector3> retval = new List<Vector3>();
         Transform source = path[0];

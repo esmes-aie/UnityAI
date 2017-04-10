@@ -8,18 +8,42 @@ public class SimpleGraphWalker : MonoBehaviour {
 
     private List<Vector3> pathToWalk;
 
-    public Transform target;
+    public List<Transform> targets;
+    private GameObject target;
+    int currentTarget = 0;
+    bool useRandom;
 	// Use this for initialization
 	void Start ()
     {
-        if(target != null)
-            pathToWalk = gm.FindPathBetween(transform, target);
+        target = new GameObject();
+        pathToWalk = new List<Vector3>();
 	}
 
     // Update is called once per frame
     void Update ()
     {
-        if (pathToWalk.Count == 0) return;
+        if (pathToWalk.Count == 0)
+        {
+            if(!useRandom)
+            {
+                useRandom = true;
+                currentTarget++;
+                currentTarget %= targets.Count;
+                pathToWalk = gm.FindPathBetween(transform, targets[currentTarget]);
+            }
+            else
+            {
+                do
+                {
+                    target.transform.position = 
+                        new Vector3(Random.Range(-4,4),Random.Range(-4, 4), 0);
+                }
+                while (Physics.CheckSphere(target.transform.position, .2f));
+                useRandom = false;
+                pathToWalk = gm.FindPathBetween(transform, target.transform);
+            }
+        }
+        
         // What direction do we want to walk in?
         Vector3 dir = (pathToWalk[0] - transform.position).normalized;
 
@@ -33,7 +57,7 @@ public class SimpleGraphWalker : MonoBehaviour {
     {
         if (target != null && gm != null)
         { 
-            pathToWalk = gm.FindPathBetween(transform, target);
+            pathToWalk = gm.FindPathBetween(transform, targets[0]);
         }
         else pathToWalk = null;
     }
@@ -41,13 +65,17 @@ public class SimpleGraphWalker : MonoBehaviour {
     private void OnDrawGizmos()
     {
         if(pathToWalk != null)
-            for(int i = 0; i < pathToWalk.Count; ++i)
+        {
+            Gizmos.DrawLine(transform.position, pathToWalk[0]);
+
+            for (int i = 0; i < pathToWalk.Count; ++i)
             {
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawWireSphere(pathToWalk[i], .3f);
-
-                if(i < pathToWalk.Count-1)
+               
+                if (i < pathToWalk.Count-1)
                     Gizmos.DrawLine(pathToWalk[i], pathToWalk[i + 1]);
             }
+        }
     }
 }

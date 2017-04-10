@@ -81,6 +81,7 @@
     <Compile Include="Assets\Graph.cs" />
     <Compile Include="Assets\GraphManager.cs" />
     <Compile Include="Assets\ListExample.cs" />
+    <Compile Include="Assets\Seek.cs" />
     <Compile Include="Assets\SimpleGraphWalker.cs" />
     <Compile Include="Assets\Solver.cs" />
   </ItemGroup>

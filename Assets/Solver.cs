@@ -40,7 +40,10 @@ namespace GraphProject
         {
             get
             {
-                List<T> retval = new List<T>();
+                if (metadata[goalNode.uid].prev == null)
+                    return null;
+
+                List <T> retval = new List<T>();
                 retval.Add(goal);
                 var n = goalNode;
 				while(n != null)
