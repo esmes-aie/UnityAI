@@ -19,7 +19,12 @@ public class SimplePursue: MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        var tpos = target.transform.position + target.GetComponent<Rigidbody>().velocity;
+        // modify how much we consider the velocity
+        // the further we are away, the more we want to consider it.
+        var t =  Vector3.Distance(target.transform.position, transform.position)/
+                                  target.GetComponent<Rigidbody>().velocity.magnitude;
+
+        var tpos = target.transform.position + t * target.GetComponent<Rigidbody>().velocity;
         // (target position + target velocity)
         var dir = (tpos - transform.position).normalized;
 

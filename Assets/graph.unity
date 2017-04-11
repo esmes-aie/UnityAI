@@ -1266,7 +1266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 345894071}
   gm: {fileID: 1875650548}
-  speed: 1
+  speed: 5
 --- !u!54 &1609248740
 Rigidbody:
   m_ObjectHideFlags: 0
