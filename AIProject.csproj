@@ -82,7 +82,11 @@
     <Compile Include="Assets\GraphManager.cs" />
     <Compile Include="Assets\ListExample.cs" />
     <Compile Include="Assets\Seek.cs" />
+    <Compile Include="Assets\SimpleFlee.cs" />
     <Compile Include="Assets\SimpleGraphWalker.cs" />
+    <Compile Include="Assets\SimplePursue.cs" />
+    <Compile Include="Assets\SimpleSeek.cs" />
+    <Compile Include="Assets\SimpleWander.cs" />
     <Compile Include="Assets\Solver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
